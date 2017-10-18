@@ -1,0 +1,174 @@
+---
+title: "第二章 计量资料的统计描述"
+author: "x2yline"
+date: "2017年10月18日"
+output: 
+  html_document: 
+    fig_caption: yes
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev='CairoPNG')
+```
+
+## 知识清单：
+
+* 求极差（range）
+* 做频数分布表和频数分布图（graph of frequency distribution）
+* 算术平均数（mean）
+* 几何均数（geometric mean）
+* 中位数与百分位数（median and percentile）
+* 四分位间距（quartile range）
+* 方差（variance）
+* 标准差（standard deviation）
+* 变异系数（coefficient of variance）
+* 正态分布（normal distribution）
+* 标准正态分布（standard normal distribution）
+
+## 图形美观，5:7或7:5
+
+## 使用R语言的内建实例数据框：faithful
+
+```{r}
+head(faithful)
+```
+
+第一列eruptions代表火山喷发的持续时间，第二列代表距离下一次喷发的间隔时间
+
+## 1. 计算极差（range）
+
+```{r}
+duration <- faithful$eruptions     # the eruption durations
+max(duration)-min(duration)     # apply the max and min functions
+range(duration)
+```
+
+## 2. 频数分布
+
+```{r}
+duration = faithful$eruptions
+breaks = seq(1.5, 5.2, length.out = 12)
+duration.cut = cut(duration, breaks, right=FALSE)
+```
+
+right属性默认为TRUE，表示每个组段为右闭左开的一个区间
+
+duration.cut为一个factor变量
+
+```{r}
+duration.freq = table(duration.cut)
+duration.freq
+cbind(duration.freq)
+```
+
+计算频率
+
+```{r}
+duration.relfreq = duration.freq / nrow(faithful)
+```
+
+展示为列的形式
+
+```{r}
+cbind(duration.freq)
+```
+```{r  }
+hist(duration, right=FALSE, 
+     breaks = breaks, labels =TRUE, 
+     freq = FALSE, col = "lightgray", 
+     border = "white", ylim=c(0, 0.6))
+```
+
+tips: 控制输出小数点位数使用
+
+```{r echo=FALSE}
+old = options(digits=1)
+options(old)    # restore the old option
+```
+
+## 3. 算术平均
+
+```{r}
+mean(faithful$eruptions)
+```
+
+## 4. 几何平均
+
+```{r}
+# 方法1
+exp(mean(log(faithful$eruptions)))
+# 方法2
+psych::geometric.mean(faithful$eruptions)
+```
+
+## 5. 中位数与百分位数
+
+```{r}
+# 方法1
+quantile(faithful$eruptions, c(0.5, 0.6))
+quantile(faithful$eruptions)
+# 方法2
+median(faithful$eruptions)
+```
+
+## 6. 四分位间距 interquartile range
+
+```{r}
+IQR(faithful$eruptions)
+```
+
+## 7. 方差与标准差
+
+```{r}
+# 方法1
+var(faithful$eruptions)
+sd(faithful$eruptions)
+sd(faithful$eruptions)^2
+# 方法2
+(sum((faithful$eruptions-mean(faithful$eruptions))^2))/(nrow(faithful)-1)
+```
+
+## 8. 变异系数
+
+```{r}
+# 方法1
+raster::cv(faithful$eruptions)
+# 方法2
+sd(faithful$eruptions)/mean(faithful$eruptions)*100
+```
+
+## 9. 正态分布和标准正态分布
+
+dnorm() 的返回值是正态分布概率密度函数，pnorm()返回值是正态分布的分布函数。函数qnorm()的返回值是给定概率p后的下分位点，rnorm()的返回值是n个正态分布随机数构成的向量。
+
+已知某正态分布均值为72，标准差为15.2，求在72出的概率密度：
+```{r}
+dnorm(72, mean=72, sd=15.2)
+```
+
+已知某正态分布均值为72，标准差为15.2，求大于84的概率：
+
+```{r}
+pnorm(84, mean=72, sd=15.2, lower.tail=FALSE)
+```
+
+
+
+已知某正态分布均值为0，标准差为1，求小于多少值时，其概率大于0.975
+
+```{r}
+qnorm(0.975, mean=0, sd=1, lower.tail=TRUE)
+```
+
+生成服从正态分布，均值为0，标准差异1的100个数：
+
+```{r}
+rnorm(100, mean=0, sd=1)
+```
+
+
+
+参考：
+
+<http://www.r-tutor.com/elementary-statistics>

@@ -1,0 +1,387 @@
+---
+title: "第四章 多个样本均数比较的方差分析"
+author: "x2yline"
+date: "2017年10月18日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev='CairoPNG')
+```
+## 知识清单
+* 完全随机设计的方差分析(Completely Randomized Design)
+* 随机区组设计的方差分析(Randomized block design)
+* 多个样本均值间的多重比较
+
+## 课外
+* 拉丁方设计资料的方差分析
+* 两阶段交叉设计的方差分析
+* 多样本方差比较的Bartlett检验和Levene检验
+
+>主要是aov函数的使用，可以直接对aov的结果直接plot
+
+## 1. 完全随机设计的方差分析（completely random design）
+
+***前提：来自正态分布的独立样本；各样本方差相等**  
+
+测试数据：例04-02.sav
+
+```
+> # install.packages("memisc")
+> library(memisc)
+> group_df <- data.frame(as.data.set(spss.system.file('/mnt/e/医学统计学（第4版）/各章例题SPSS数据文件/例04-02.sav')))
+
+> head(group_df)
+    group ldl_c
+1 placebo  3.53
+2 placebo  4.59
+3 placebo  4.34
+4 placebo  2.66
+5 placebo  3.59
+6 placebo  3.13
+
+> with(group_df, summary(aov(ldl_c ~group)))
+             Df Sum Sq Mean Sq F value   Pr(>F)    
+group         3  32.16  10.719   24.88 1.67e-12 ***
+Residuals   116  49.97   0.431                     
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+```
+
+参考：  
+http://www.r-tutor.com/elementary-statistics/analysis-variance/completely-randomized-design
+
+### 2. 随机区组设计的方差分析（randomized block design）
+
+测试数据：例04-04.sav
+
+```
+> group_df <- data.frame(as.data.set(spss.system.file('E:/医学统计学（第4版）/各章例题SPSS数据文件/例04-04.sav')))
+> head(group_df)
+  group treat weight
+1     1   A药   0.82
+2     2   A药   0.73
+3     3   A药   0.43
+4     4   A药   0.41
+5     5   A药   0.68
+6     1   B药   0.65
+
+> with(group_df, summary(aov(weight ~ factor(treat)+factor(group))))
+              Df Sum Sq Mean Sq F value  Pr(>F)   
+factor(treat)  2 0.2280 0.11400  11.937 0.00397 **
+factor(group)  4 0.2284 0.05709   5.978 0.01579 * 
+Residuals      8 0.0764 0.00955                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+```
+
+
+### 3. 多个样本均值间的多重比较
+
+若用两样本均数比较的t检验进行多重比较，将会加大犯Ⅰ类错误（把本无差别的两个总体均数判为有差别）的概率。  
+
+当方差分析的结果为拒绝H0，接受H1时，说明g个总体均数不全相等。 
+
+若想进一步了解哪些两个总体均数不等，需进行多个样本均数间的两两比较或称多重比较。
+
+#### 3.1 LSD-t检验 (least significant difference, LSD)
+
+查表为t分布表，使用条件：**一对或几对比较**
+
+检验统计量：  
+
+![](http://upload-images.jianshu.io/upload_images/3947437-15663ad6c81af3e4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)  
+
+![](http://upload-images.jianshu.io/upload_images/3947437-ca4823fe8e6ac93d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+>LSD-t检验公式与两样本均数比较的t检验公式区别在于检验统计量和自由度ν的计算上。
+
+
+示例数据：例04-02.sav
+
+* 方法1：
+
+```
+> group_df <- data.frame(as.data.set(spss.system.file('E:/医学统计学（第4版）/各章例题SPSS数据文件/例04-02.sav')))
+> r_mean_sq <- summary(aov(group_df$ldl_c ~ factor(group_df$group)))[[1]][-1, 3]
+> v_lsd <- summary(aov(group_df$ldl_c ~ factor(group_df$group)))[[1]][-1, 1]
+> ns <- table(group_df$group)
+> S_lsd <- sqrt(r_mean_sq*(1/ns[c("2.4g")]+1/ns[c("placebo")]))
+> delta_x <- mean(group_df$ldl_c[group_df$group=="placebo"])-mean(group_df$ldl_c[group_df$group=="2.4g"])
+> pt(abs(delta_x/S_lsd), df=v_lsd, lower.tail=F)*2
+        2.4g 
+4.887216e-05 
+```
+
+* 方法2：
+
+```
+> library(agricolae)
+> lsd_result <- LSD.test(aov(group_df$ldl_c ~ (group_df$group)), "group_df$group", group=T, alpha=0.01)
+> lsd_result # 分组为相同说明无显著差异，如2.4g与4.8g
+$statistics
+    MSerror  Df   Mean      CV  t.value       LSD
+  0.4307502 116 2.7025 24.2855 2.618878 0.4437949
+
+$parameters
+        test p.ajusted         name.t ntr alpha
+  Fisher-LSD      none group_df$group   4  0.01
+
+$means
+        group_df$ldl_c       std  r      LCL      UCL  Min  Max    Q25   Q50    Q75
+2.4g          2.715333 0.6381586 30 2.401523 3.029144 1.56 4.32 2.3175 2.665 2.9650
+4.8g          2.698000 0.4971671 30 2.384190 3.011810 1.68 3.68 2.3375 2.655 2.9800
+7.2g          1.966333 0.7464421 30 1.652523 2.280144 0.89 3.71 1.3350 1.905 2.4225
+placebo       3.430333 0.7151247 30 3.116523 3.744144 1.37 4.59 2.9650 3.530 3.9825
+
+$comparison
+NULL
+
+$groups
+        group_df$ldl_c groups
+placebo       3.430333      a
+2.4g          2.715333      b
+4.8g          2.698000      b
+7.2g          1.966333      c
+
+attr(,"class")
+[1] "group"
+```
+
+* 方法3：
+
+```
+> pairwise.t.test(group_df$ldl_c, group_df$group)
+
+	Pairwise comparisons using t tests with pooled SD 
+
+data:  group_df$ldl_c and group_df$group 
+
+     placebo 2.4g    4.8g   
+2.4g 0.00013 -       -      
+4.8g 0.00013 0.91871 -      
+7.2g 2.1e-13 0.00011 0.00013
+
+P value adjustment method: holm 
+```
+
+参考：  
+https://stackoverflow.com/questions/11454521/r-t-test-and-pairwise-t-test-give-different-results
+
+#### 3.2 Dunnett-t检验
+
+适用条件：g-1个实验组与一个**对照组**均数差别的多重比较，检验统计量Dunnett-t 有专门的界值表，是LSD-t的特殊化
+
+```
+> library(multcomp)
+载入需要的程辑包：mvtnorm
+载入需要的程辑包：survival
+载入需要的程辑包：TH.data
+
+载入程辑包：‘TH.data’
+
+The following object is masked from ‘package:MASS’:
+
+    geyser
+
+> cht <- glht(aov(ldl_c ~ group, data=group_df), linfct = mcp(group= "Tukey"))
+> summary(cht, test = univariate())
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Multiple Comparisons of Means: Tukey Contrasts
+
+
+Fit: aov(formula = ldl_c ~ group, data = group_df)
+
+Linear Hypotheses:
+                    Estimate Std. Error t value Pr(>|t|)    
+2.4g - placebo == 0 -0.71500    0.16946  -4.219 4.89e-05 ***
+4.8g - placebo == 0 -0.73233    0.16946  -4.322 3.29e-05 ***
+7.2g - placebo == 0 -1.46400    0.16946  -8.639 3.57e-14 ***
+4.8g - 2.4g == 0    -0.01733    0.16946  -0.102    0.919    
+7.2g - 2.4g == 0    -0.74900    0.16946  -4.420 2.23e-05 ***
+7.2g - 4.8g == 0    -0.73167    0.16946  -4.318 3.34e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+(Univariate p values reported)
+
+> cht <- glht(aov(ldl_c ~ group, data=group_df), linfct = mcp(group= "Dunnett"), alternative="two.sided")
+> summary(cht)
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Multiple Comparisons of Means: Dunnett Contrasts
+
+
+Fit: aov(formula = ldl_c ~ group, data = group_df)
+
+Linear Hypotheses:
+                    Estimate Std. Error t value Pr(>|t|)    
+2.4g - placebo == 0  -0.7150     0.1695  -4.219 0.000131 ***
+4.8g - placebo == 0  -0.7323     0.1695  -4.322  < 1e-04 ***
+7.2g - placebo == 0  -1.4640     0.1695  -8.639  < 1e-04 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+(Adjusted p values reported -- single-step method)
+```
+
+#### 3.3 SNK-q检验
+
+适用条件：多个样本均数两两之间的**全面比较**（比较所有的组）  
+
+```
+> # 新用法
+> agricolae::SNK.test(aov(ldl_c ~ group, data=group_df), "group",  console = T)
+
+Study: aov(ldl_c ~ group, data = group_df) ~ "group"
+
+Student Newman Keuls Test
+for ldl_c 
+
+Mean Square Error:  0.4307502 
+
+group,  means
+
+           ldl_c       std  r  Min  Max
+2.4g    2.715333 0.6381586 30 1.56 4.32
+4.8g    2.698000 0.4971671 30 1.68 3.68
+7.2g    1.966333 0.7464421 30 0.89 3.71
+placebo 3.430333 0.7151247 30 1.37 4.59
+
+Alpha: 0.05 ; DF Error: 116 
+
+Critical Range
+        2         3         4 
+0.3356368 0.4023275 0.4417253 
+
+Means with the same letter are not significantly different.
+
+           ldl_c groups
+placebo 3.430333      a
+2.4g    2.715333      b
+4.8g    2.698000      b
+7.2g    1.966333      c
+> print(agricolae::SNK.test(aov(ldl_c ~ group, data=group_df), "group", alpha=0.01))
+$statistics
+    MSerror  Df   Mean      CV
+  0.4307502 116 2.7025 24.2855
+
+$parameters
+  test name.t ntr alpha
+   SNK  group   4  0.01
+
+$snk
+     Table CriticalRange
+2 3.703652     0.4437949
+3 4.202736     0.5035983
+4 4.500339     0.5392590
+
+$means
+           ldl_c       std  r  Min  Max    Q25   Q50    Q75
+2.4g    2.715333 0.6381586 30 1.56 4.32 2.3175 2.665 2.9650
+4.8g    2.698000 0.4971671 30 1.68 3.68 2.3375 2.655 2.9800
+7.2g    1.966333 0.7464421 30 0.89 3.71 1.3350 1.905 2.4225
+placebo 3.430333 0.7151247 30 1.37 4.59 2.9650 3.530 3.9825
+
+$comparison
+NULL
+
+$groups
+           ldl_c groups
+placebo 3.430333      a
+2.4g    2.715333      b
+4.8g    2.698000      b
+7.2g    1.966333      c
+
+attr(,"class")
+[1] "group"
+
+# 旧用法
+SNK.test(y, treat, DFerror, MSerror)
+```
+
+### 4. 拉丁方设计资料的方差分析
+
+* 数据准备
+
+```
+> library("memisc")
+> group_df <- data.frame(as.data.set(spss.system.file('E:/医学统计学（第4版）/各章例题SPSS数据文件/例04-05_1.sav')))
+> head(group_df)
+  row column treat result
+1   1      1     C     87
+2   1      2     B     75
+3   1      3     E     81
+4   1      4     D     75
+5   1      5     A     84
+6   1      6     F     66
+```
+
+* 方差分析
+
+```
+> group_df$row <- factor(group_df$row)
+> group_df$col <- factor(group_df$column)
+> model<- aov(result~row + col + treat, data=group_df)
+> summary(model)
+            Df Sum Sq Mean Sq F value Pr(>F)  
+row          5  250.5   50.09   1.424 0.2584  
+col          5   75.1   15.03   0.427 0.8242  
+treat        5  657.3  131.47   3.738 0.0149 *
+Residuals   20  703.4   35.17                 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+```
+
+### 5. 两阶段交叉设计的方差分析
+
+即按个体分解，按阶段分解和按处理分解进行方差分析，代码与拉丁方的方法大致相同
+
+### 6. Bartlett检验（需要正态整体）
+
+```
+> library("memisc")
+> group_df <- data.frame(as.data.set(spss.system.file('E:/医学统计学（第4版）/各章例题SPSS数据文件/例04-02.sav')))
+> head(group_df)
+    group ldl_c
+1 placebo  3.53
+2 placebo  4.59
+3 placebo  4.34
+4 placebo  2.66
+5 placebo  3.59
+6 placebo  3.13
+> bartlett.test(ldl_c~group, data=group_df) # bartlett.test(group_df$ldl_c,group_df$group)
+
+	Bartlett test of homogeneity of variances
+
+data:  ldl_c by group
+Bartlett's K-squared = 5.2192, df = 3, p-value = 0.1564
+```
+
+参考：  
+https://stat.ethz.ch/R-manual/R-devel/library/stats/html/bartlett.test.html
+
+### 7. Levene检验（不必要正态整体）【还有一个Fligner-Killeen test，见参考】
+
+```
+> library(car)
+
+载入程辑包：‘car’
+
+The following object is masked from ‘package:memisc’:
+
+    recode
+
+> leveneTest(ldl_c~group, data=group_df)
+Levene's Test for Homogeneity of Variance (center = median)
+       Df F value Pr(>F)
+group   3   1.493 0.2201
+      116          
+      
+      
+```
+
+参考：  
+http://blog.sina.com.cn/s/blog_5cd2f1e20101979p.html  
+http://www.cookbook-r.com/Statistical_analysis/Homogeneity_of_variance/

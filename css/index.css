@@ -1,0 +1,66 @@
+.cover {
+	width: 30vw;
+	height: 100vh;
+	color: red;
+	background-color: blue;
+	margin-left: 10vw;
+	position: fixed;
+}
+.cover_text1 {
+	color: white;
+	font-size: 2.5vw;
+	text-align: center;
+	/*line-height: 40vh;*/
+	font-weight: bold;
+	font-family: "Microsoft YaHei";
+	/*position: fixed;*/
+
+}
+.cover_text2 {
+	color: yellow;
+	font-size: 1.5vw;
+	text-align: right;
+	margin-right: 5vw;
+	line-height: 20vh;
+	font-weight: bold;
+	font-family: "Microsoft YaHei";
+}
+
+.cover_text3 {
+	font-size: 1.2vw;
+	line-height: 4vw;
+	text-align: center;
+	color: white;
+	font-family: "Microsoft YaHei";
+	font-weight: bold;
+}
+
+.chapters {
+	/*background-color: lightgray;*/
+	float: left;
+	height: 100vh;
+	width: 100vw;
+	margin-left: 42vw;
+}
+
+h1 {
+	color: gray;
+	font-size: 1.5vw;
+	font-family: "Microsoft YaHei";
+
+}
+
+a:visited{
+	color: gray;
+	font-weight: normal;
+}
+
+a {
+	color: gray;
+	text-decoration: none;
+}
+
+.header_chapter {
+	color: #2F4F4F;
+	font-size: 1.7vw;
+}
