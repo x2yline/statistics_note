@@ -6,6 +6,10 @@
 	margin-left: 10vw;
 	position: fixed;
 }
+body {
+	width=2000px;
+}
+
 .cover_text1 {
 	color: white;
 	font-size: 2.5vw;
