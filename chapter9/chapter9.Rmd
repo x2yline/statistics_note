@@ -316,3 +316,62 @@ cor.test(data9_5$age, data9_5$v, conf.level=0.95, alternative="two.sided")
 ```
 
 ### 2.4 决定系数
+定义：回归平方和与总平方和之比，计算公式为
+
+\[
+    R^{2}=\frac{SS_{回}}{SS_{总}}=\frac{l_{XY}^{2}/l_{XX}}{l_{YY}}  
+\]
+对于双变量回归分析，$R^{2}$即$r^{2}$，处可以概括拟合效果外，还可以作假设检验
+
+\[
+    F=\frac{R^{2}}{(1-R^{2})(n-2)}=\frac{SS_{回}}{SS_{残}/\nu_{残}}=\frac{MS_{回}}{MS_{残}}
+\]
+
+R语言实现：
+```{r}
+data9_5 <- haven::read_sav(
+  file="E:\\医学统计学（第4版）\\各章例题SPSS数据文件\\例09-05.sav")
+colnames(data9_5) <- c("number", "age", "v")
+line.model <- lm(v~age, data=data9_5)
+r.squared <- summary(line.model)$r.squared
+print(r.squared)
+adj.r.squared <- summary(line.model)$adj.r.squared
+print(adj.r.squared)
+r.squared <- 1-var(line.model$residuals)*(nrow(data9_5)-1)/
+  (var(data9_5$v)*(nrow(data9_5)-1))
+print(r.squared)
+f.statistic <- (r.squared)/((1-r.squared)/(nrow(data9_5)-2))
+print(f.statistic)
+summary(line.model)$fstatistic
+```
+
+
+## 3. 直线回归应用注意事项
+* 根据目的选择变量及统计方法（自变量和因变量，如重测信度评价的相关系数，r应达到0.40以上
+
+* 进行相关，回归分析前应绘制散点图，离群值
+
+* 结果解释
+    * 相关系数或回归系数的绝对值反映密切程度
+    * p值越小越有理由认为变量间的直线关系存在
+    
+* 残差图观察是否符合模型假设的条件：自变量与因变量关系为线性，误差服从均数为0的正态分布，且方差相等，各观测独立
+    * 正常为在y=0处对称分布，并且左右对称
+    * 离群值会与群体远离
+    * 喇叭状（左右不对称）说明方差不齐（须稳定化处理）
+    * 呈曲线则可能是符合曲线模型
+    * 呈直线说明残差与时间存在相关
+    
+* R语言实现残差图
+```{r}
+data9_5 <- haven::read_sav(
+  file="E:\\医学统计学（第4版）\\各章例题SPSS数据文件\\例09-05.sav")
+colnames(data9_5) <- c("number", "age", "v")
+line.model <- lm(v~age, data=data9_5)
+# +geom_point(aes(age, v), size=1.5)+
+#   geom_smooth(aes(age, v), method="lm")+
+library(ggplot2)
+ggplot(data9_5)+
+  geom_point(aes(x=age, y=line.model$residuals), color="red", size=2)+
+  ylab("residuals")
+```
