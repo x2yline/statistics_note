@@ -1,16 +1,8 @@
----
-title: "第十章 统计表与统计图"
-author: "x2yline"
-date: "`r Sys.Date()`"
-output:
-  prettydoc::html_pretty:
-    theme: tactile
-    highlight: vignette
----
+# 第十章 统计表与统计图
+x2yline  
+`r Sys.Date()`  
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, dev='CairoPNG')
-```
+
 
 ## 知识清单：
 * 1. 统计表
@@ -77,7 +69,8 @@ knitr::opts_chunk$set(echo = TRUE, dev='CairoPNG')
 > 直条图的纵轴尺度起点必须为零
 
 * R语言实现
-```{r}
+
+```r
 # 构建数据
 df <- data.frame(dose=c("D0.5", "D1", "D2"),
                 len=c(4.2, 10, 29.5))
@@ -87,9 +80,16 @@ library(ggplot2)
 p<-ggplot(data=df, aes(x=dose, y=len)) +
   geom_bar(stat="identity")
 print(p)
+```
+
+![](chapter10_files/figure-html/unnamed-chunk-1-1.png)<!-- -->
+
+```r
 # 转为卧式直条图
 p + coord_flip()
 ```
+
+![](chapter10_files/figure-html/unnamed-chunk-1-2.png)<!-- -->
 还有很多种变化可以参考：http://www.sthda.com/english/wiki/ggplot2-barplots-quick-start-guide-r-software-and-data-visualization
 
 #### 2.3.2 圆图和百分比图
@@ -120,19 +120,45 @@ p + coord_flip()
 #### 2.3.6 统计地图(statistical map) 
 > 统计地图是用不同的颜色和花纹表示统计量的值在地理分布上的变化，适宜描述研究指标的地理分布。     
 
-```{r}
+
+```r
 # 设置api秘钥
 options(remap.ak="P6VDgmNVU7NcIbKyG8yHWWCpodkOGvmS")
 # 加载地图数据
 library(maptools)
+```
+
+```
+## Loading required package: sp
+```
+
+```
+## Checking rgeos availability: TRUE
+```
+
+```r
 library(ggplot2)
 # .shp文件
 map_data <- readShapePoly(file.choose())
+```
+
+```
+## Warning: use rgdal::readOGR or sf::st_read
+```
+
+```r
 gg1 <- ggplot() + 
   geom_polygon(data = map_data, 
                aes(x=long, y = lat, group = group), 
                fill=NA, color="gray") +
   coord_fixed(1.4)+theme_void()
+```
+
+```
+## Regions defined for each Polygons
+```
+
+```r
 library(REmap)
 origin = c('潮州','北京','广州','包头','衡阳',
                 '桃源县','邵阳','湘阴县','长沙市','衡南县', 
@@ -153,7 +179,8 @@ origin = c('潮州','北京','广州','包头','衡阳',
 #                  color = "red", size = 2, alpha=0.8)
 ```
 ![](./map.png)
-```{r}
+
+```r
 library(REmap)
 origin = c('潮州','北京','广州','包头','衡阳',
                 '桃源县','邵阳','湘阴县','长沙市','衡南县', 
