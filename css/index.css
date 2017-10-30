@@ -40,6 +40,13 @@
 		font-weight: bold;
 	}
 
+	.cover_text4 {
+		font-size: 0.3vw;
+		color: white;
+		text-align: center;
+		padding-top: 58vh;
+	}
+
 	.chapters {
 		/*background-color: lightgray;*/
 		float: left;
@@ -100,7 +107,9 @@
 	.cover_text3 {
 		display: none;
 	}
-
+	.cover_text4 {
+		display: none;
+	}
 	.chapters {
 		/*background-color: lightgray;*/
 		/*text-shadow: center;*/

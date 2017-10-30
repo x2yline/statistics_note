@@ -10,6 +10,7 @@ raw_data1 <- c(0.053, 0.057,
               1.008, 0.824,
               0.588, 0.326)
 
+
 # clean data
 data_norm1 <- raw_data1[seq(1, 11, 2)]
 data_norm2 <- raw_data1[seq(2, 12, 2)]
@@ -17,6 +18,11 @@ data_norm <- (data_norm1+data_norm2)/2
 data_norm <- data_norm -data_norm[1]
 data1 <- data.frame(conc=c(0, 12.5, 25, 50, 100), od=data_norm[-length(data_norm)])
 
+
+data_to_table <- data.frame(pore_number=1:12, 
+                            reagent=rep(c(0, 12.5, 25, 50, 100, 37),each=2), 
+                            od=raw_data1)
+write.csv(file="ELISA.csv", data_to_table, row.names=FALSE)
 # line model fit (the model is y=b*x)
 line.model <- lm(od~0+conc, data=data1)
 
@@ -35,7 +41,7 @@ y = data1$od
 
 # par(family='Sans SimHei')
 # 做散点图，并把坐标轴隐藏，
-plot(x, y, pch=16, xlab="concentration (pg/ml)", ylab="490nm absorption", bty="n",
+plot(x, y, pch=16, xlab="concentration (pg/ml)", ylab="490nm Optical Density", bty="n",
      xlim=c(min(x), max(x))+c(0, 0.2)*(max(x)-min(x))/5,
      ylim=c(min(y), max(y))+c(0, 0.2)*(max(y)-min(y))/5,
      main="ELISA line model graphic", axes=FALSE)
@@ -75,5 +81,11 @@ abline(v=conc_target, lty=2)
 clip(min(x), max(x), min(y), max(y)+(max(y)-min(y))/6)
 text(conc_target+16, absorb_target, 
      paste("(", round(conc_target, 3), ", ",  round(absorb_target, 3), ")", sep=""))
-
 # dev.off()
+line.model2 <- lm(x~y)
+lxx <- var(y)*(nrow(data1)-1)
+syx <- sqrt(sum(line.model2$residuals^2)/(nrow(data1)-2))
+Sb <- syx/(sqrt(lxx))
+Sy02 <- syx*sqrt(1/nrow(data1)+
+                   (0.402-mean(y))^2/
+                   (var(y)*nrow(data1)-1))
