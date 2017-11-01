@@ -12,7 +12,7 @@
 
 <meta name="author" content="x2yline" />
 
-<meta name="date" content="2017-10-30" />
+<meta name="date" content="2017-11-01" />
 
 <title>第十一章 多因素试验资料的方差分析</title>
 
@@ -73,41 +73,41 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <header>
 <h1 class="title toc-ignore">第十一章 多因素试验资料的方差分析</h1>
 <h3 class="author">x2yline</h3>
-<h3 class="date">2017-10-30</h3>
+<h3 class="date">2017-11-01</h3>
 </header>
 
 <hr>
 
 
 
-<div class="section level2">
+<div id="t" class="section level2">
 <h2>知识清单</h2>
 <ul>
-<li><ol style="list-style-type: decimal">
-<li><strong>析因资料的方差分析</strong></li>
-</ol>
+<li><strong><a href="#a0">1. 析因资料的方差分析</a></strong>
 <ul>
-<li>几个基本概念</li>
-<li>基本分析思路</li>
-<li>R语言实现</li>
+<li><a href="#a1">几个基本概念</a></li>
+<li><a href="#a2">基本分析思路</a></li>
+<li><a href="#a3">R语言实现</a></li>
 </ul></li>
-<li><ol start="2" style="list-style-type: decimal">
-<li>正交设计与方差分析</li>
-</ol></li>
+<li><a href="#b0">2. 正交设计与方差分析</a>
+<ul>
+<li><a href="#b1">基本概念</a></li>
+<li><a href="#b2">分析方法</a></li>
+</ul></li>
 <li><ol start="3" style="list-style-type: decimal">
-<li>嵌套设计资料的方差分析</li>
+<li><del>嵌套设计资料的方差分析</del></li>
 </ol></li>
 <li><ol start="4" style="list-style-type: decimal">
-<li>裂区设计资料的方差分析</li>
+<li><del>裂区设计资料的方差分析</del></li>
 </ol></li>
 </ul>
 </div>
-<div class="section level2">
-<h2>1. 析因资料的方差分析</h2>
-<div class="section level3">
-<h3>1.1 基本概念</h3>
+<div id="a0" class="section level2">
+<h2><a href="#t">1. 析因资料的方差分析(factorial experiment)</a></h2>
+<div id="a1" class="section level3">
+<h3>1.1 <a href="#t">基本概念</a></h3>
 <blockquote>
-<p>多个因素多个水平的全面交叉分为处理组，2因素2水平是至少每一组合至少重复2次</p>
+<p>多个因素多个水平的全面交叉分为处理组，每一组合至少重复2次</p>
 </blockquote>
 <p>以下表为例：</p>
 <table>
@@ -142,8 +142,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>主效应和交互作用的区别就是加减号不同</p>
 </blockquote>
 </div>
-<div class="section level3">
-<h3>1.2 基本思路</h3>
+<div id="a2" class="section level3">
+<h3>1.2 <a href="#t">基本思路</a></h3>
 <blockquote>
 <p>变异分解的思路</p>
 </blockquote>
@@ -154,9 +154,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>自由度：<br />
 g=IJK个处理组，每组例数为n则总变异自由度为gn-1，A主效应自由度为I-1，B主效应自由度为J-1，C主效应自由度为K-1，AB的自由度为(I-1)(K-1)···，ABC的自由度为(I-1)(J-1)(K-1)，误差的自由度为为g(n-1)也等于总自由度减去其余分解出来的自由度。</p>
 </div>
-<div id="r" class="section level3">
-<h3>1.3 R语言实现</h3>
-<p>与前面的<a href="https://x2yline.github.io/statistics_note/chapter4/chapter4.html">拉丁方分析</a>一样【有一点不同是拉丁方没有考虑个因素直接的交互作用而使用<code>aov(y~a+b+c)</code>，考虑交互作用则用<code>aov(y~a*b*c)</code>，用aov函数按不同因素进行分解即可，如例11-3的数据：</p>
+<div id="a3" class="section level3">
+<h3>1.3 <a href="#t">R语言实现</a></h3>
+<p>与前面的<a href="https://x2yline.github.io/statistics_note/chapter4/chapter4.html">拉丁方分析</a>一样【有一点不同是拉丁方没有考虑个因素直接的交互作用而使用<code>aov(y~a+b+c)</code>，因为使用拉丁方的前提条件是<strong>横行、直列单位组因素与试验因素间不存在交互作用</strong><span class="citation"><a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></span>】，考虑交互作用则用<code>aov(y~a*b*c)</code>，用aov函数按不同因素进行分解即可，如例11-3的数据：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data1 &lt;-<span class="st"> </span>haven<span class="op">::</span><span class="kw">read_sav</span>(
   <span class="st">&quot;E:/医学统计学（第4版）/各章例题SPSS数据文件/例11-03.sav&quot;</span>)
 <span class="co"># x是热感觉评分，a是军装类型，b是环境，c是活动状态</span>
@@ -190,8 +190,68 @@ data1<span class="op">$</span>c &lt;-<span class="st"> </span><span class="kw">f
 <p>结果与教材上的一致，结论为不同军装，不同环境和不同活动状态的主观热感觉都有差别，但尚不能认为军装与其他两个因素存在交互作用（b，c）。</p>
 </div>
 </div>
-<div class="section level2">
-<h2>2. 正交设计与方差分析</h2>
+<div id="b0" class="section level2">
+<h2><a href="#t">2. 正交设计与方差分析</a></h2>
+<div id="b1" class="section level3">
+<h3><a href="#t">2.1 基本概念</a></h3>
+<blockquote>
+<p>当析因设计要求的实验次数太多时，一个非常自然的想法就是从析因设计的水平组合中，选择一部分有代表性水平组合进行试验。因此就出现了分式析因设计(fractional factorial designs)，但是对于试验设计知识较少的实际工作者来说，选择适当的分式析因设计还是比较困难的。</p>
+</blockquote>
+<blockquote>
+<p>正交试验设计(Orthogonal experimental design)是分式析因设计的主要方法，是研究多因素多水平的又一种设计方法，它是根据正交性从全面试验中挑选出部分有代表性的点进行试验，这些有代表性的点具备了“均匀分散，齐整可比”的特点。例如作一个三因素三水平的实验，按全面实验要求，须进行33=27种组合的实验，且尚未考虑每一组合的重复数。若按<span class="math inline">\(L_{9}(3^{3})\)</span>正交表按排实验，只需作9次，按<span class="math inline">\(L_{18}(3^{7})\)</span>正交表进行18次实验，显然大大减少了工作量。因而正交实验设计在很多领域的研究中已经得到广泛应用。<span class="citation"><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></span></p>
+</blockquote>
+<ul>
+<li><span class="math inline">\(L_{n}(j^{i})\)</span>的含义：
+<ul>
+<li>L–正交表的符号</li>
+<li>n–正交表的行数(试验次数，试验方案数)</li>
+<li>j–正交表中的数码(因素的位级数)</li>
+<li>i–正交表的列数(试验因素的个数)</li>
+<li><span class="math inline">\(n=j \cdot i\)</span>–全部试验次数(完全因素位级组合数)</li>
+</ul></li>
+<li>两项性质
+<ul>
+<li>每一列中，不同的数字出现的次数相等</li>
+<li>任意两列中数字的排列方式齐全而且均衡</li>
+</ul></li>
+</ul>
+<blockquote>
+<p>以上两点充分的体现了正交表的两大优越性，即“均匀分散性，整齐可比”。通俗的说，每个因素的每个水平与另一个因素各水平各碰一次，这就是正交性。</p>
+</blockquote>
+<p>正交表由两个表构成，一个是用来安排实验的，另一个是表头设计表</p>
+<blockquote>
+<p>在正交试验法中的最好点，虽然不一定是全面试验的最好点，但也往往是相当好的点。特别在只有一两个因素起主要作用时，正交试验法能保证主要因素的各种可能都不会漏掉。这点在探索性工作中很重要，其他试验方法难于做到</p>
+</blockquote>
+</div>
+<div id="b2" class="section level3">
+<h3><a href="#t">2.2 结果分析</a></h3>
+<ul>
+<li>直接分析法
+<ul>
+<li>直接比较出哪几个因素组合较好<br />
+</li>
+<li>计算交互作用的较好组合<br />
+</li>
+<li>结合比较和计算的结果</li>
+</ul></li>
+<li>方差分析
+<ul>
+<li>需要留有误差列<br />
+</li>
+<li>每列的组间离均差平方和进行方差分析</li>
+</ul></li>
+</ul>
+<div id="reference" class="section level4">
+<h4>Reference:</h4>
+</div>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><span style="font-variant: small-caps;">拉丁方设计之R篇</span>, <a href="http://blog.sciencenet.cn/blog-1114360-745402.html" class="uri">http://blog.sciencenet.cn/blog-1114360-745402.html</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p><span style="font-variant: small-caps;">正交实验设计.doc-生物在线网站</span>, <a href="http://download.bioon.com.cn/upload/201105_import/20110509395.doc" class="uri">http://download.bioon.com.cn/upload/201105_import/20110509395.doc</a><a href="#fnref2">↩</a></p></li>
+</ol>
 </div>
 </div>
 </div>

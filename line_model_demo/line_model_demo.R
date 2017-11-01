@@ -2,14 +2,13 @@
 # Cairo::CairoPNG("ELISA.png", width=1400, height=1000, res=200)
 
 # raw data each data has been replicated measured twice
-# the last row is the meaure of sample
+# the last row is the measure of sample
 raw_data1 <- c(0.053, 0.057,
-              0.366, 0.315,
-              0.677, 0.679,
-              0.764, 0.792,
-              1.008, 0.824,
-              0.588, 0.326)
-
+               0.366, 0.315,
+               0.677, 0.679,
+               0.764, 0.792,
+               1.008, 0.824,
+               0.588, 0.326)
 
 # clean data
 data_norm1 <- raw_data1[seq(1, 11, 2)]
@@ -18,11 +17,6 @@ data_norm <- (data_norm1+data_norm2)/2
 data_norm <- data_norm -data_norm[1]
 data1 <- data.frame(conc=c(0, 12.5, 25, 50, 100), od=data_norm[-length(data_norm)])
 
-
-data_to_table <- data.frame(pore_number=1:12, 
-                            reagent=rep(c(0, 12.5, 25, 50, 100, 37),each=2), 
-                            od=raw_data1)
-write.csv(file="ELISA.csv", data_to_table, row.names=FALSE)
 # line model fit (the model is y=b*x)
 line.model <- lm(od~0+conc, data=data1)
 
@@ -41,10 +35,10 @@ y = data1$od
 
 # par(family='Sans SimHei')
 # 做散点图，并把坐标轴隐藏，
-plot(x, y, pch=16, xlab="concentration (pg/ml)", ylab="490nm Optical Density", bty="n",
+plot(x, y, pch=16, xlab="浓度 (pg/ml)", ylab="490nm OD值", bty="n",
      xlim=c(min(x), max(x))+c(0, 0.2)*(max(x)-min(x))/5,
      ylim=c(min(y), max(y))+c(0, 0.2)*(max(y)-min(y))/5,
-     main="ELISA line model graphic", axes=FALSE)
+     main="ELISA 标准曲线", axes=FALSE, family = "Microsoft Yahei")
 
 # 自定义坐标轴，at为坐标点位置，labels默认为坐标点的数值
 # tck表示坐标刻度长度，pos表示坐标轴的位置
@@ -62,17 +56,21 @@ clip(min(x), max(x), min(y), max(y)+(max(y)-min(y))/6)
 abline(line.model, lwd=2, col="red")
 
 # 标注直线方程和拟合系数
-text(x=quantile(x, 0.85), y=quantile(y, .45), 
-     labels=paste("y = ", 
-                   round(line.model$coefficients, 5),"x\nR2=", 
-                   round(summary(line.model)$r.squared, 4), sep="")
-     )
+text1 <- paste("y = ", round(line.model$coefficients, 5),"x",sep="")
+text(x=quantile(x, 0.80), y=quantile(y, .39),
+     labels= substitute(paste(text1, r.squared, sep=''), list(
+       text1=paste(text1, "\n"), r.squared="")),
+     adj=c(0,0))
+text(x=quantile(x, 0.80), y=quantile(y, .39),
+     labels= substitute(paste(text1, R^2, " = ", r.squared, sep=''), list(
+       text1="\n", r.squared=round(summary(line.model)$r.squared, 4))),
+     adj=c(0,0))
 
 # 标注样本点
 absorb_target = data_norm[length(data_norm)]
 conc_target <- absorb_target/line.model$coefficients
 points(conc_target, absorb_target, pch=16, col="blue", cex=1.3)
-clip(0, conc_target, 0, absorb_target)
+clip(0, conc_target, 0, absorb_target*2)
 abline(h=absorb_target, lty=2)
 clip(0, conc_target+1, 0, absorb_target)
 abline(v=conc_target, lty=2)
@@ -81,11 +79,5 @@ abline(v=conc_target, lty=2)
 clip(min(x), max(x), min(y), max(y)+(max(y)-min(y))/6)
 text(conc_target+16, absorb_target, 
      paste("(", round(conc_target, 3), ", ",  round(absorb_target, 3), ")", sep=""))
+
 # dev.off()
-line.model2 <- lm(x~y)
-lxx <- var(y)*(nrow(data1)-1)
-syx <- sqrt(sum(line.model2$residuals^2)/(nrow(data1)-2))
-Sb <- syx/(sqrt(lxx))
-Sy02 <- syx*sqrt(1/nrow(data1)+
-                   (0.402-mean(y))^2/
-                   (var(y)*nrow(data1)-1))

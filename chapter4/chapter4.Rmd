@@ -2,7 +2,15 @@
 title: "第四章 多个样本均数比较的方差分析"
 author: "x2yline"
 date: "2017年10月18日"
-output: html_document
+bibliography: bibliography.bib
+
+csl: ../css/bluebook2.csl
+
+output:
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: vignette
+
 ---
 
 ```{r setup, include=FALSE}
@@ -20,7 +28,7 @@ knitr::opts_chunk$set(echo = TRUE, dev='CairoPNG')
 
 >主要是aov函数的使用，可以直接对aov的结果直接plot
 
-## 1. 完全随机设计的方差分析（completely random design）
+## 1. 完全随机设计的方差分析（completely random design） @avo
 
 ***前提：来自正态分布的独立样本；各样本方差相等**  
 
@@ -48,8 +56,6 @@ Residuals   116  49.97   0.431
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 ```
 
-参考：  
-http://www.r-tutor.com/elementary-statistics/analysis-variance/completely-randomized-design
 
 ### 2. 随机区组设计的方差分析（randomized block design）
 
@@ -90,9 +96,11 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 
 检验统计量：  
 
-![](http://upload-images.jianshu.io/upload_images/3947437-15663ad6c81af3e4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)  
+\[
+  LSD-t = \frac{\bar{X_{i}}-\bar{X_{j}}}{S_{\bar{X_{i}}-\bar{X_{j}}}}, \ \nu=\nu_{误差}\\
+  S_{\bar{X_{i}}-\bar{X_{j}}} = \sqrt{MS_{误差}(\frac{1}{n_{i}}+\frac{1}{n_{j}})}
+\]
 
-![](http://upload-images.jianshu.io/upload_images/3947437-ca4823fe8e6ac93d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 >LSD-t检验公式与两样本均数比较的t检验公式区别在于检验统计量和自由度ν的计算上。
 
@@ -302,6 +310,15 @@ SNK.test(y, treat, DFerror, MSerror)
 ```
 
 ### 4. 拉丁方设计资料的方差分析
+> 拉丁方的前提条件是横行、直列单位组因素与试验因素间不存在交互作用 @latin_sq 
+
+> 在临床试验中，拉丁方设计的行区组通常是受试对象，列区组通常是重复观测次数，并要求前一个处理的作用不会影响到下一个处理 @latinsq_4
+
+> 拉丁方实验设计与区组实验设计一样，都是为了平衡额外变量，以防止这些额外变量成为混淆因子，破坏实验研究的内部效度。如果简化点来解释，一般来说，区组实验设计多用于对一个额外变量的平衡，如被试因素、时间顺序因素、空间位置因素等；拉丁方实验设计则可以看成是区组设计的扩展，即扩展到可以平衡两个额外变量（当然，如果设计巧妙，也可以达到对多于两个额外变量的平衡，但那也是在二维平衡模式上变化出来的） @latinsq_2   @latinsq_3  
+
+> 拉丁方实验设计既有优点也有缺点。其优点是，在许多研究情境中，这种设计比完全随机和随机区组设计更加有效，它可以使研究者平衡并分离出两个额外变量的影响，因而减小实验误差，可获得对实验处理效应的更精确的估价。另外，通过对方格单元内误差与残差的F检验，可以检验额外变量与自变量是否有交互作用，以检验采用拉丁方设计是否合适。 
+
+> 拉丁方设计的缺点是，它的关于自变量与额外变量不存在交互作用的假设在很多情况下都难以保证，尤其当实验中含有多个自变量的时候。因此，拉丁方实验设计在多因素实验中不常用。另外，拉丁方实验设计要求每个额外变量的水平数与实验处理数必须相等，这也在一定程度上限制了拉丁方实验设计的使用。 
 
 * 数据准备
 
@@ -338,7 +355,7 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 
 即按个体分解，按阶段分解和按处理分解进行方差分析，代码与拉丁方的方法大致相同
 
-### 6. Bartlett检验（需要正态整体）
+### 6. Bartlett检验（需要正态整体） @h_v_1 
 
 ```
 > library("memisc")
@@ -359,10 +376,8 @@ data:  ldl_c by group
 Bartlett's K-squared = 5.2192, df = 3, p-value = 0.1564
 ```
 
-参考：  
-https://stat.ethz.ch/R-manual/R-devel/library/stats/html/bartlett.test.html
 
-### 7. Levene检验（不必要正态整体）【还有一个Fligner-Killeen test，见参考】
+### 7. Levene检验（不必要正态整体）【Fligner-Killeen test也很常用】 @vaiance_homo_1 @anova_1 
 
 ```
 > library(car)
@@ -382,6 +397,4 @@ group   3   1.493 0.2201
       
 ```
 
-参考：  
-http://blog.sina.com.cn/s/blog_5cd2f1e20101979p.html  
-http://www.cookbook-r.com/Statistical_analysis/Homogeneity_of_variance/
+#### Reference:

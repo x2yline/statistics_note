@@ -1,0 +1,50 @@
+% Encoding: UTF-8
+
+@Unpublished{chisq1,
+  author = {R help},
+  title  = {In chisq.test(x) : Chi-squared approximation may be incorrect},
+  url    = {http://r.789695.n4.nabble.com/In-chisq-test-x-Chi-squared-approximation-may-be-incorrect-td845040.html},
+}
+
+@Unpublished{latin_sq,
+  title = {拉丁方设计之R篇},
+  url   = {http://blog.sciencenet.cn/blog-1114360-745402.html},
+}
+
+@Unpublished{latinsq_2,
+  title = {如何理解“拉丁方实验设计”(《实验心理学》问答009)},
+  url   = {http://blog.sina.com.cn/s/blog_49b5655001000d66.html},
+}
+
+@Book{latinsq_3,
+  title     = {心理与教育研究中的多因素实验设计},
+  publisher = {北京师范大学出版社},
+  year      = {1994},
+}
+
+@Unpublished{latinsq_4,
+  title = {拉丁方设计},
+  url   = {https://wenku.baidu.com/view/c8cb8ad9a58da0116c1749e2.html},
+}
+
+@Unpublished{anova_1,
+  title = {R语言: 用于多个比较的方差分析（ANOVA）},
+  url   = {http://blog.sina.com.cn/s/blog_5cd2f1e20101979p.html},
+}
+
+@Unpublished{vaiance_homo_1,
+  title = {Homogeneity of variance},
+  url   = {http://www.cookbook-r.com/Statistical_analysis/Homogeneity_of_variance/},
+}
+
+@Unpublished{h_v_1,
+  title = {Bartlett Test of Homogeneity of Variances},
+  url   = {https://stat.ethz.ch/R-manual/R-devel/library/stats/html/bartlett.test.html},
+}
+
+@Unpublished{avo,
+  title = {Completely Randomized Design},
+  url   = {http://www.r-tutor.com/elementary-statistics/analysis-variance/completely-randomized-design},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}
