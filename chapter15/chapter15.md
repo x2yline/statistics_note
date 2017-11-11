@@ -1,16 +1,6 @@
----
-title: "第十五章 多元线性回归分析"
-author: "x2yline"
-date: "`r Sys.Date()`"
-output:
-  prettydoc::html_pretty:
-    theme: tactile
-    highlight: vignette
-
-bibliography: bibliography.bib
-
-csl: ../css/bluebook2.csl
----
+# 第十五章 多元线性回归分析
+x2yline  
+`r Sys.Date()`  
 
 > 这一章首先介绍多元线性回归的及其基本统计量，偏回归系数，决定系数R方及adjusted R方，接着对各自变量的作用进行评价和选择，最后是多元线性回归模型的使用注意事项
 
@@ -30,44 +20,108 @@ csl: ../css/bluebook2.csl
 #### R语言实现多元线性回归
 > 数据例15-1
 
-```{r}
+
+```r
 # data15_1 <- haven::read_sav(
 #   file="E:\\医学统计学（第4版）\\各章例题SPSS数据文件\\例15-01.sav")
 # colnames(data15_1) <- c("id", "x1", "x2", "x3", "x4", "y")
 load(url("https://github.com/x2yline/statistics_note/blob/master/chapter15/%E4%BE%8B15_1.rdata?raw=true"))
-pander::pander(head(data15_1, 4))
+head(data15_1, 4)
+```
 
+```
+##   id   x1   x2   x3   x4    y
+## 1  1 5.68 1.90 4.53  8.2 11.2
+## 2  2 3.79 1.64 7.32  6.9  8.8
+## 3  3 6.02 3.56 6.95 10.8 12.3
+## 4  4 4.85 1.07 5.88  8.3 11.6
+```
+
+```r
 line.model <- lm(y~x1+x2+x3+x4, data=data15_1)
 print(line.model)
+```
+
+```
+## 
+## Call:
+## lm(formula = y ~ x1 + x2 + x3 + x4, data = data15_1)
+## 
+## Coefficients:
+## (Intercept)           x1           x2           x3           x4  
+##      5.9433       0.1424       0.3515      -0.2706       0.6382
 ```
 
 ### [1.2 总体方程的评价指标](#t) {#a2}
 
 > 该部分指标对应summary(line.model)的部分结果
-```{r}
+
+```r
 summary(line.model)
+```
+
+```
+## 
+## Call:
+## lm(formula = y ~ x1 + x2 + x3 + x4, data = data15_1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.6268 -1.2004 -0.2276  1.5389  4.4467 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)  
+## (Intercept)   5.9433     2.8286   2.101   0.0473 *
+## x1            0.1424     0.3657   0.390   0.7006  
+## x2            0.3515     0.2042   1.721   0.0993 .
+## x3           -0.2706     0.1214  -2.229   0.0363 *
+## x4            0.6382     0.2433   2.623   0.0155 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.01 on 22 degrees of freedom
+## Multiple R-squared:  0.6008,	Adjusted R-squared:  0.5282 
+## F-statistic: 8.278 on 4 and 22 DF,  p-value: 0.0003121
 ```
 
 #### 回归方程的方差分析
 > 把总离均差平方和分解为回归平方和与残差平和，再作方差分析
 
-```{r}
+
+```r
 f_stat <- summary(line.model)$fstatistic
 cat(f_stat)
+```
+
+```
+## 8.277793 4 22
+```
+
+```r
 pf(f_stat[1], 
    df1=f_stat[2], 
    df2=f_stat[3], 
    lower.tail=FALSE)
 ```
 
+```
+##        value 
+## 0.0003121289
+```
+
 #### 决定系数R方
 > 与直线回归定义相同，即回归平方和/总离均差平方和
 
-```{r}
+
+```r
 ss1 <- sum((line.model$residuals)^2)
 ss2 <- sum((data15_1$y-mean(data15_1$y))^2)
 R.squared <- 1-(ss1/ss2)
 cat(R.squared)
+```
+
+```
+## 0.6008069
 ```
 
 ```复相关系数```: 决定系数开根号
@@ -76,11 +130,16 @@ cat(R.squared)
 
 #### 校正的R方:  
 
-```{r}
+
+```r
 obj_n <- nrow(data15_1)
 var_n <- 4
 R.adj <- 1-(1-R.squared)*(obj_n-1)/(obj_n-var_n-1)
 cat(R.adj)
+```
+
+```
+## 0.5282263
 ```
 
 ### [1.3 各自变量的假设检验及评价](#t) {#a3}
@@ -99,8 +158,18 @@ t_{i}=\frac{b_{i}}{S_{b_{i}}}
 其中，$b_{i}$为偏回归系数的估计值，$S_{b_{i}}$为$b_{i}$的标准误计算比较复杂，自由度为n-m-1。
 
 #### R语言中各偏平和检验的p值
-```{r}
+
+```r
 summary(line.model)$coef
+```
+
+```
+##               Estimate Std. Error    t value   Pr(>|t|)
+## (Intercept)  5.9432678  2.8285899  2.1011416 0.04730765
+## x1           0.1424465  0.3656530  0.3895674 0.70060210
+## x2           0.3514655  0.2042042  1.7211469 0.09925903
+## x3          -0.2705853  0.1213938 -2.2289878 0.03634597
+## x4           0.6382012  0.2432644  2.6234880 0.01551557
 ```
 倒数最后两列分别是t统计量和p值
 
